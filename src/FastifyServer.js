@@ -17,7 +17,7 @@ const ksmf = require('ksmf');
 const Response = require('./FastifyResponse');
 const Request = require('./FastifyRequest');
 
-const BaseServer = ksmf.server.BaseServer;
+const BaseServer = ksmf.server.Base;
 class FastifyServer extends BaseServer {
 
     constructor() {
