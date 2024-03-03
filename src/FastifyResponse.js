@@ -10,10 +10,13 @@
  */
 
 const ksmf = require('ksmf');
-const BaseResponse = ksmf.server.BaseResponse;
+const BaseResponse = ksmf.server.Response;
 
 class FastifyResponse extends BaseResponse {
 
+    /**
+     * @param {*} driver 
+     */
     constructor(driver) {
         super(driver)
         this.name = 'fastify';

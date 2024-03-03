@@ -17,7 +17,7 @@ const ksmf = require('ksmf');
 const Response = require('./FastifyResponse');
 const Request = require('./FastifyRequest');
 
-const BaseServer = ksmf.server.BaseServer;
+const BaseServer = ksmf.server.Base;
 class FastifyServer extends BaseServer {
 
     constructor() {
@@ -47,9 +47,10 @@ class FastifyServer extends BaseServer {
 
     /**
      * @description add cookie support
-     * @param {Object} cookie 
+     * @param {Object} [cookie]
+     * @param {String} [cookie.secret] 
      */
-    initCookie(cookie = null) {
+    initCookie(cookie) {
         //... Allow cookie Parser
         this.web.register(require('@fastify/cookie'), {
             secret: cookie?.secret || 'my-secret',
@@ -70,7 +71,7 @@ class FastifyServer extends BaseServer {
     /**
      * @description delete routes 
      * @param {String|Array<String>} value 
-     * @param {Function} check 
+     * @param {Function|null} [check] 
      * @returns {Boolean}
      */
     del(value, check = null) {
@@ -78,7 +79,7 @@ class FastifyServer extends BaseServer {
             return false;
         }
         check = check instanceof Function ? check : ((item, value) => Array.isArray(value) ? !value.includes(item?.route?.path) : item?.route?.path !== value);
-        this.web._router.stack = value ? this.web._router.stack.filter(layer => check(layer, value)) : [];
+        this.web._router.stack = value ? this.web._router.stack.filter(layer => check instanceof Function && check(layer, value)) : [];
         return true;
     }
 
@@ -129,7 +130,7 @@ class FastifyServer extends BaseServer {
      * @param {Object} [payload.app] 
      * @param {Function} [payload.callback] 
      */
-    start(payload = null) {
+    start(payload) {
         const { key, cert, protocol = 'http', port = 3003, host = '127.0.0.1', app = this.web } = payload || {};
         return new Promise(async (resolve, reject) => {
             try {
@@ -155,22 +156,43 @@ class FastifyServer extends BaseServer {
         }
     }
 
+    /**
+     * @description event on server error
+     * @param {Function} callback 
+     */
     onError(callback) {
         callback instanceof Function && this.web.setErrorHandler((error, req, res) => callback(error, new Request(req), new Response(res), null));
     }
 
+    /**
+     * @description event on incoming request
+     * @param {Function} callback 
+     */
     onRequest(callback) {
         callback instanceof Function && this.web.addHook('onRequest', (req, res, next) => callback(new Request(req), new Response(res), next));
     }
 
+    /**
+     * @description event on incoming response
+     * @param {Function} callback 
+     */
     onResponse(callback) {
         callback instanceof Function && this.web.addHook('onResponse', (req, res, next) => callback(new Request(req), new Response(res), next));
     }
 
+    /**
+     * @description event on page not found
+     * @param {Function} callback 
+     */
     on404(callback) {
         callback instanceof Function && this.web?.setDefaultRoute((req, res) => callback(new Request(req), new Response(res), null));
     }
 
+    /**
+     * @description get the route list 
+     * @param {*} web 
+     * @returns {Array<*>} routes 
+     */
     routes(web) {
         return [];
     }
