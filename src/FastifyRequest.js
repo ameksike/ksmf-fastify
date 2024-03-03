@@ -13,6 +13,9 @@ const ksmf = require('ksmf');
 const BaseRequest = ksmf.server.Request;
 class FastifyRequest extends BaseRequest {
 
+    /**
+     * @param {*} driver 
+     */
     constructor(driver) {
         super(driver);
         this.name = 'fastify';
