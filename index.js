@@ -4,9 +4,6 @@ module.exports = new (class extends FastifyServer {
         Server: FastifyServer,
         Response: require('./src/FastifyResponse'),
         Request: require('./src/FastifyRequest'),
-        middleware: {
-            cookie: require('@fastify/cookie'),
-            static: require('serve-static')
-        }
+        middleware: {}
     };
 });

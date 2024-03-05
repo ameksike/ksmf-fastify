@@ -13,11 +13,6 @@
  */
 const https = require('https');
 const ksmf = require('ksmf');
-const Fastify = require('fastify');
-
-const mwMiddie = require('@fastify/middie');
-const mwServeStatic = require('serve-static');
-const mwCookie = require('@fastify/cookie');
 
 const Response = require('./FastifyResponse');
 const Request = require('./FastifyRequest');
@@ -41,10 +36,10 @@ class FastifyServer extends ksmf.server.Base {
      */
     async configure(payload) {
         super.configure(payload);
-        this.web = payload?.web || Fastify({ logger: !!payload?.logger });
-        this.drv = payload?.drv || Fastify;
-        this.drv.static = mwServeStatic;
-        await this.web.register(mwMiddie);
+        this.web = payload?.web || require('fastify')({ logger: !!payload?.logger });
+        this.drv = payload?.drv || require('fastify');
+        this.drv.static = require('serve-static');
+        await this.web.register(require('@fastify/middie'));
         return this;
     }
 
@@ -55,7 +50,7 @@ class FastifyServer extends ksmf.server.Base {
      */
     initCookie(option) {
         //... Allow cookie Parser
-        this.web.register(mwCookie, {
+        this.web.register(require('@fastify/cookie'), {
             secret: option?.secret || '-ksmf-',
             parseOptions: {}
         });
