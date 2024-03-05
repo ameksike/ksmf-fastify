@@ -22,28 +22,29 @@ declare class FastifyServer extends FastifyServer_base {
     }): Promise<FastifyServer>;
     /**
      * @description add cookie support
-     * @param {Object} [cookie]
-     * @param {String} [cookie.secret]
+     * @param {Object} [option]
+     * @param {String} [option.secret]
      */
-    initCookie(cookie?: {
+    initCookie(option?: {
         secret?: string;
     }): void;
     /**
      * @description set a route
-     *
-     * @callback Handler
-     * @param {Object} [req]
-     * @param {Object} [res]
-     * @param {Function} [next]
-     *
      * @param {Object} payload
      * @param {String} payload.route
      * @param {String} payload.method
-     * @param {Handler} payload.handler
-     * @param {Array} payload.middlewares
-     * @returns {Object}
+     * @param {Object} [payload.options]
+     * @param {import('./types').TFnHandler} payload.handler
+     * @param {Array<import('./types').TFnHandler>} [payload.middlewares]
+     * @returns {Object|null}
      */
-    set(payload: any): any;
+    set(payload: {
+        route: string;
+        method: string;
+        options?: any;
+        handler: import('./types').TFnHandler;
+        middlewares?: Array<import('./types').TFnHandler>;
+    }): any | null;
     /**
      * @description start the server
      * @param {Object} [payload]

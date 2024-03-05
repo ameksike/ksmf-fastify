@@ -16,9 +16,7 @@ const ksmf = require('ksmf');
 
 const Response = require('./FastifyResponse');
 const Request = require('./FastifyRequest');
-
-const BaseServer = ksmf.server.Base;
-class FastifyServer extends BaseServer {
+class FastifyServer extends ksmf.server.Base {
 
     constructor() {
         super();
@@ -47,15 +45,36 @@ class FastifyServer extends BaseServer {
 
     /**
      * @description add cookie support
-     * @param {Object} [cookie]
-     * @param {String} [cookie.secret] 
+     * @param {Object} [option]
+     * @param {String} [option.secret] 
      */
-    initCookie(cookie) {
+    initCookie(option) {
         //... Allow cookie Parser
         this.web.register(require('@fastify/cookie'), {
-            secret: cookie?.secret || 'my-secret',
+            secret: option?.secret || '-ksmf-',
             parseOptions: {}
         });
+    }
+
+    /**
+     * @description add Fingerprint support
+     * @override
+     * @param {Object|null} [config] 
+     * @param {Object|null} [web] 
+     */
+    initFingerprint(config = null, web = null) {
+        // TODO
+    }
+
+    /**
+     * @description add session support
+     * @override
+     * @param {Object|null} [config] 
+     * @param {Object|null} [web] 
+     */
+    initSession(config = null, web = null) {
+        // TODO
+        this.session = null;
     }
 
     /**
@@ -75,28 +94,19 @@ class FastifyServer extends BaseServer {
      * @returns {Boolean}
      */
     del(value, check = null) {
-        if (!(this.web?._router?.stack?.filter instanceof Function)) {
-            return false;
-        }
-        check = check instanceof Function ? check : ((item, value) => Array.isArray(value) ? !value.includes(item?.route?.path) : item?.route?.path !== value);
-        this.web._router.stack = value ? this.web._router.stack.filter(layer => check instanceof Function && check(layer, value)) : [];
+        // TODO
         return true;
     }
 
     /**
      * @description set a route
-     * 
-     * @callback Handler
-     * @param {Object} [req]
-     * @param {Object} [res]
-     * @param {Function} [next]
-     * 
      * @param {Object} payload 
      * @param {String} payload.route 
      * @param {String} payload.method 
-     * @param {Handler} payload.handler 
-     * @param {Array} payload.middlewares 
-     * @returns {Object} 
+     * @param {Object} [payload.options] 
+     * @param {import('./types').TFnHandler} payload.handler 
+     * @param {Array<import('./types').TFnHandler>} [payload.middlewares] 
+     * @returns {Object|null} 
      */
     set(payload) {
         const { route, middlewares, handler, method, options = {} } = payload;
@@ -109,9 +119,17 @@ class FastifyServer extends BaseServer {
                 return null;
             }
             if (middlewares) {
+                // TODO
                 // options.preHandler = Array.isArray(middlewares) ? middlewares : [middlewares];
             }
-            return action.apply(this.web, [route, options, (req, res) => handler(new Request(req), new Response(res), null)]);
+            return action.apply(this.web, [
+                route,
+                options,
+                /**
+                 * @type {import('./types').TFnMiddleware}
+                 */
+                (req, res) => handler(new Request(req), new Response(res), null)
+            ]);
         }
         catch (_) {
             return null;
@@ -161,7 +179,12 @@ class FastifyServer extends BaseServer {
      * @param {Function} callback 
      */
     onError(callback) {
-        callback instanceof Function && this.web.setErrorHandler((error, req, res) => callback(error, new Request(req), new Response(res), null));
+        callback instanceof Function && this.web.setErrorHandler(
+            /**
+             * @type {import('./types').TFnHandlerError}
+             */
+            (error, req, res) => callback(error, new Request(req), new Response(res), null)
+        );
     }
 
     /**
@@ -169,7 +192,13 @@ class FastifyServer extends BaseServer {
      * @param {Function} callback 
      */
     onRequest(callback) {
-        callback instanceof Function && this.web.addHook('onRequest', (req, res, next) => callback(new Request(req), new Response(res), next));
+        callback instanceof Function && this.web.addHook(
+            'onRequest',
+            /**
+             * @type {import('./types').TFnHandlerHook}
+             */
+            (req, res, next) => callback(new Request(req), new Response(res), next)
+        );
     }
 
     /**
@@ -177,7 +206,13 @@ class FastifyServer extends BaseServer {
      * @param {Function} callback 
      */
     onResponse(callback) {
-        callback instanceof Function && this.web.addHook('onResponse', (req, res, next) => callback(new Request(req), new Response(res), next));
+        callback instanceof Function && this.web.addHook(
+            'onResponse',
+            /**
+             * @type {import('./types').TFnHandlerHook}
+             */
+            (req, res, next) => callback(new Request(req), new Response(res), next)
+        );
     }
 
     /**
@@ -185,7 +220,12 @@ class FastifyServer extends BaseServer {
      * @param {Function} callback 
      */
     on404(callback) {
-        callback instanceof Function && this.web?.setDefaultRoute((req, res) => callback(new Request(req), new Response(res), null));
+        callback instanceof Function && this.web?.setDefaultRoute(
+            /**
+             * @type {import('./types').TFnMiddleware}
+             */
+            (req, res) => callback(new Request(req), new Response(res), null)
+        );
     }
 
     /**

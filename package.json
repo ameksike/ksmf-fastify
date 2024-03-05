@@ -1,13 +1,12 @@
 {
   "name": "ksmf-fastify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fastify support for KsMf framework",
   "main": "index.js",
   "types": "types/index.d.ts",
   "scripts": {
     "test": "jest ",
-    "type": "npx typescript tsc -p ./tsconfig.declarations.json",
-    "builds": "npx -p typescript tsc ./index.js --target ES2022 --module commonjs --declaration --allowJs --checkJs --emitDeclarationOnly --esModuleInterop --allowSyntheticDefaultImports --resolveJsonModule --outDir types"
+    "types": "npx -p typescript tsc ./index.js --target ES2022 --module commonjs --declaration --allowJs --checkJs --emitDeclarationOnly --esModuleInterop --allowSyntheticDefaultImports --resolveJsonModule --outDir types"
   },
   "repository": {
     "type": "git",
@@ -33,13 +32,15 @@
   },
   "homepage": "https://github.com/ameksike/ksmf-fastify#readme",
   "devDependencies": {
+    "@types/connect": "^3.4.38",
+    "@types/serve-static": "^1.15.5",
     "jest": "^26.6.3"
   },
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
     "@fastify/middie": "^8.3.0",
-    "fastify": "^4.26.1",
-    "ksmf": "^1.3.0",
+    "fastify": "^4.26.2",
+    "ksmf": "^1.3.2",
     "serve-static": "^1.15.0"
   }
 }
