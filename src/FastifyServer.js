@@ -13,10 +13,11 @@
  */
 const https = require('https');
 const ksmf = require('ksmf');
-const Fastify = require('fastify')
+const Fastify = require('fastify');
+
 const mwMiddie = require('@fastify/middie');
 const mwServeStatic = require('serve-static');
-const mwCookie = require('@fastify/cookie')
+const mwCookie = require('@fastify/cookie');
 
 const Response = require('./FastifyResponse');
 const Request = require('./FastifyRequest');
