@@ -7,6 +7,6 @@ class FastifyPlugin extends FastifyServer {
         Request: require('./src/FastifyRequest'),
         middleware: {}
     };
-};
+}; 
 
 module.exports = FastifyPlugin;
