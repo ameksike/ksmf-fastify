@@ -32,7 +32,7 @@ class FastifyServer extends ksmf.server.Base {
      * @param {Object} [payload.session]
      */
     constructor(payload = undefined) {
-        super();
+        super(payload);
         this.web = payload?.web || require('fastify')({ logger: !!payload?.logger });
         this.drv = payload?.drv || require('fastify');
         this.static = payload?.static || { publish: require('serve-static') };
