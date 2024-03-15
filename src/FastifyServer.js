@@ -18,8 +18,24 @@ const Response = require('./FastifyResponse');
 const Request = require('./FastifyRequest');
 class FastifyServer extends ksmf.server.Base {
 
-    constructor() {
-        super();
+
+    /**
+     * @description configure the web server
+     * @param {Object} [payload]
+     * @param {Object} [payload.web]
+     * @param {Object} [payload.drv]
+     * @param {Object} [payload.logger]
+     * @param {Object} [payload.helper]
+     * @param {Object} [payload.option]
+     * @param {Object} [payload.cookie]
+     * @param {Object} [payload.static]
+     * @param {Object} [payload.session]
+     */
+    constructor(payload = undefined) {
+        super(payload);
+        this.web = payload?.web || require('fastify')({ logger: !!payload?.logger });
+        this.drv = payload?.drv || require('fastify');
+        this.static = payload?.static || { publish: require('serve-static') };
         this.name = 'fastify';
     }
 
@@ -31,14 +47,13 @@ class FastifyServer extends ksmf.server.Base {
      * @param {Object} [payload.logger]
      * @param {Object} [payload.helper]
      * @param {Object} [payload.option]
+     * @param {Object} [payload.static]
      * @param {Boolean} [payload.cookie] 
      * @returns {Promise<FastifyServer>} self
      */
     async configure(payload) {
         super.configure(payload);
-        this.web = payload?.web || require('fastify')({ logger: !!payload?.logger });
-        this.drv = payload?.drv || require('fastify');
-        this.drv.static = require('serve-static');
+        this.static = this.static || { publish: require('serve-static') };
         await this.web.register(require('@fastify/middie'));
         return this;
     }
@@ -84,7 +99,7 @@ class FastifyServer extends ksmf.server.Base {
      */
     publish(url, path) {
         //... Allow static files
-        url && path && this.drv && this.web?.use(url, this.drv.static(path));
+        url && path && this.static?.publish instanceof Function && this.web?.use instanceof Function && this.web.use(url, this.static?.publish(path));
     }
 
     /**
