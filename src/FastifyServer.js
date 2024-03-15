@@ -47,11 +47,13 @@ class FastifyServer extends ksmf.server.Base {
      * @param {Object} [payload.logger]
      * @param {Object} [payload.helper]
      * @param {Object} [payload.option]
+     * @param {Object} [payload.static]
      * @param {Boolean} [payload.cookie] 
      * @returns {Promise<FastifyServer>} self
      */
     async configure(payload) {
         super.configure(payload);
+        this.static = this.static || { publish: require('serve-static') };
         await this.web.register(require('@fastify/middie'));
         return this;
     }
